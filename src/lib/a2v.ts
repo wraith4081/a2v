@@ -23,14 +23,9 @@ export default class A2V {
 
             const cssStyle = {
                 'name': style.Name,
-                'font-weight': style.Bold === '-1' ? 'bold' : 'normal',
-                'font-style': style.Italic === '-1' ? 'italic' : 'normal',
                 //css['text-decoration'] = v4PlusStyle.underline ? 'underline' : 'none';
                 //css['text-decoration'] = v4PlusStyle.strikeout ? 'line-through' : 'none';
-                'color': BGR(style.PrimaryColour),
                 // secondaryColour
-                'background-color': BGR(style.BackColour),
-                'font-stretch': (Number(style.ScaleX) !== 100) ? `${Number(style.ScaleX) * XYPercentage}%` : '100%',
                 'font-size': (
                     Number(style.ScaleY) !== 100
                         ? ((Number(style.Fontsize) * Number(style.ScaleY) / 100) ?? style.Fontsize)
@@ -40,7 +35,6 @@ export default class A2V {
                 // angle
                 // borderStyle
                 // outline
-                'text-shadow': `${style.Shadow}px ${style.Shadow}px ${style.Shadow}px ${BGR(style.OutlineColour)}`,
                 // alignment
                 // marginL
                 // marginR
@@ -48,7 +42,33 @@ export default class A2V {
                 // encoding
                 // name
                 'font-family': `'${style.Fontname}'`,
-            } as const;
+            };
+
+            if (BGR(style.PrimaryColour)) {
+                (cssStyle as any)['color'] = BGR(style.PrimaryColour);
+            }
+
+            if (BGR(style.BackColour)) {
+                (cssStyle as any)['background-color'] = BGR(style.BackColour);
+            }
+
+            if (Number(style.Shadow) > 0 && BGR(style.OutlineColour)) {
+                (cssStyle as any)['text-shadow'] = `${style.Shadow}px ${style.Shadow}px ${style.Shadow}px ${BGR(style.OutlineColour)}`
+            }
+
+            if (style.Bold === '-1') {
+                (cssStyle as any)['font-weight'] = 'bold';
+            }
+
+            if (style.Italic === '-1') {
+                (cssStyle as any)['font-style'] = 'italic';
+            }
+
+            const stretch = (Number(style.ScaleX) !== 100) ? `${Number(style.ScaleX) * XYPercentage}%` : '100%';
+
+            if (stretch !== '100%') {
+                (cssStyle as any)['font-stretch'] = stretch;
+            }
 
             this.styles.set(className, cssStyle as Partial<ParsedASSStyle>);
         })
